@@ -12,7 +12,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-username/your-repo.git'
+                git branch: 'feature', url: 'https://github.com/Thaveenaraj/MyProjects.git'
             }
         }
 
