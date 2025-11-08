@@ -56,7 +56,7 @@ pipeline {
 
         stage('Deploy to EKS') {
             steps {
-                withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
                     sh """
                     kubectl set image deployment/calculator-deployment calculator-container=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
                     kubectl rollout status deployment/calculator-deployment -n default
