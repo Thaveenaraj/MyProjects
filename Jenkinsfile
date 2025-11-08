@@ -3,27 +3,31 @@ pipeline {
 
     environment {
         AWS_REGION = "ap-south-1"
+        AWS_ACCOUNT_ID = "383053847833"
         ECR_REPO_NAME = "rdsproject-ap"
-        ECR_URI = "383053847833.dkr.ecr.ap-south-1.amazonaws.com/rdsproject-ap/${ECR_REPO_NAME}"
-        DOCKER_IMAGE_TAG = "latest"
+        ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
+        DOCKER_IMAGE_TAG = "1.0"
     }
 
     stages {
 
         stage('Checkout Code') {
             steps {
-                git branch: 'feature', url: 'https://github.com/Thaveenaraj/MyProjects.git'
+                // ✅ Use correct branch name (feature1)
+                git branch: 'feature1', url: 'https://github.com/Thaveenaraj/MyProjects.git'
             }
         }
 
         stage('Maven Build') {
             steps {
+                echo "Building project with Maven..."
                 sh 'mvn clean package -DskipTests'
             }
         }
 
         stage('Docker Build') {
             steps {
+                echo "Building Docker image..."
                 sh """
                 docker build -t ${ECR_REPO_NAME}:${DOCKER_IMAGE_TAG} .
                 """
@@ -32,15 +36,17 @@ pipeline {
 
         stage('Login to AWS ECR') {
             steps {
+                echo "Logging in to Amazon ECR..."
                 sh """
                 aws ecr get-login-password --region ${AWS_REGION} \
-                | docker login --username AWS --password-stdin ${ECR_URI}
+                | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                 """
             }
         }
 
         stage('Tag & Push Image to ECR') {
             steps {
+                echo "Tagging and pushing Docker image to ECR..."
                 sh """
                 docker tag ${ECR_REPO_NAME}:${DOCKER_IMAGE_TAG} ${ECR_URI}:${DOCKER_IMAGE_TAG}
                 docker push ${ECR_URI}:${DOCKER_IMAGE_TAG}
@@ -50,9 +56,10 @@ pipeline {
 
         stage('Deploy to EKS') {
             steps {
+                echo "Deploying to EKS..."
                 sh """
-                kubectl set image deployment/calculator-deployment calculator-container=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
-                kubectl rollout status deployment/calculator-deployment -n default
+                kubectl set image deployment/rds-springboot-deployment rds-springboot-container=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
+                kubectl rollout status deployment/rds-springboot-deployment -n default
                 """
             }
         }
