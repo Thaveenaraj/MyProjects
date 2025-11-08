@@ -58,8 +58,9 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
                     sh """
-                    kubectl set image deployment/calculator-deployment calculator-container=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
-                    kubectl rollout status deployment/calculator-deployment -n default
+                    aws eks update-kubeconfig --region ${AWS_REGION} --name rds-cluster
+                    kubectl set image deployment/rds-springboot-app rds-springboot-app=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
+                    kubectl rollout status deployment/rds-springboot-app -n default
                     """
                 }
             }
