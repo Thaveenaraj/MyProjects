@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = "ap-south-1"
-        AWS_ACCOUNT_ID = "383053847833"
-        ECR_REPO_NAME = "rdsproject-ap"
-        ECR_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
-        DOCKER_IMAGE_TAG = "1.0"
+        AWS_REGION = "ap-south-1"
+        ECR_REPO_NAME = "rdsproject-ap"
+        ECR_URI = "383053847833.dkr.ecr.ap-south-1.amazonaws.com/rdsproject-ap/${ECR_REPO_NAME}"
+        DOCKER_IMAGE_TAG = "1.0"
     }
 
     stages {
