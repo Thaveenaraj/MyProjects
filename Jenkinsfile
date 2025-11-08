@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        AWS_ACCOUNT_ID = "383053847833"
         AWS_REGION = "ap-south-1"
         ECR_REPO_NAME = "rdsproject-ap"
         ECR_URI = "383053847833.dkr.ecr.ap-south-1.amazonaws.com/rdsproject-ap/${ECR_REPO_NAME}"
