@@ -34,19 +34,19 @@ pipeline {
             }
         }
 
-        stage('Login to AWS ECR') {
+        stage('Login to ECR') {
             steps {
-                echo "🔐 Logging in to Amazon ECR..."
-                sh """
-                aws ecr get-login-password --region ${AWS_REGION} \
-                | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                """
+                withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
+                    sh """
+                    aws ecr get-login-password --region ${AWS_REGION} \
+                    | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                    """
+                }
             }
         }
 
         stage('Tag & Push Image to ECR') {
             steps {
-                echo "📤 Tagging and pushing Docker image to ECR..."
                 sh """
                 docker tag ${ECR_REPO_NAME}:${DOCKER_IMAGE_TAG} ${ECR_URI}:${DOCKER_IMAGE_TAG}
                 docker push ${ECR_URI}:${DOCKER_IMAGE_TAG}
@@ -56,25 +56,18 @@ pipeline {
 
         stage('Deploy to EKS') {
             steps {
-                echo "🚀 Deploying latest Docker image to EKS..."
-                sh """
-                aws eks update-kubeconfig --region ${AWS_REGION} --name rds-cluster
-
-                kubectl set image deployment/rds-springboot-deployment \
-                rds-springboot-app=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
-
-                kubectl rollout status deployment/rds-springboot-deployment -n default
-                """
+                withAWS(credentials: 'aws-creds', region: "${AWS_REGION}") {
+                    sh """
+                    kubectl set image deployment/calculator-deployment calculator-container=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
+                    kubectl rollout status deployment/calculator-deployment -n default
+                    """
+                }
             }
         }
     }
 
     post {
-        success {
-            echo "✅ Deployment Successful!"
-        }
-        failure {
-            echo "❌ Deployment Failed!"
-        }
+        success { echo "✅ Deployment Successful!" }
+        failure { echo "❌ Deployment Failed!" }
     }
 }
