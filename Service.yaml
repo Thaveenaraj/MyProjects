@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: employee-lb
+  name: rds-springboot-service
 spec:
   type: LoadBalancer
   selector:
-    app: employee
+    app: rds-springboot-app
   ports:
     - port: 80
       targetPort: 8080
-
