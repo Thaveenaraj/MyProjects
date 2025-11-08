@@ -15,7 +15,14 @@ spec:
         app: rds-springboot-app
     spec:
       containers:
-      - name: rds-springboot-app
-        image: 383053847833.dkr.ecr.ap-south-1.amazonaws.com/rdsproject:1.0
-        ports:
-        - containerPort: 8080
+        - name: rds-springboot-app
+          image: 383053847833.dkr.ecr.ap-south-1.amazonaws.com/rdsproject-ap:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://aurora-postgres-cluster.cluster-czpjhxjfnlpf.ap-south-1.rds.amazonaws.com:5432/companydb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: auroradbadmin
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: Password123!
