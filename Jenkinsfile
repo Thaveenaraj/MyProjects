@@ -58,9 +58,9 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
                     sh """
-                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-                    chmod +x kubectl
-                    sudo mv kubectl /usr/local/bin/kubectl
+                    // curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    // chmod +x kubectl
+                    // sudo mv kubectl /usr/local/bin/kubectl
                     aws eks update-kubeconfig --region ${AWS_REGION} --name rds-cluster
                     kubectl set image deployment/rds-springboot-app rds-springboot-app=${ECR_URI}:${DOCKER_IMAGE_TAG} -n default
                     kubectl rollout status deployment/rds-springboot-app -n default
